@@ -336,7 +336,7 @@ def forward_marginal(x_t, beta, delta_t, rng=None, MASK=-1):
     
     return x_t_delta_t
 
-Storiing the forward process particles
+# Comment: Storing the forward process particles
 def run_diffusion_experiment(w, mu, beta, T, n_mc, checkpoint_times):
     """
     Run forward process once, then can run multiple reverse methods.
