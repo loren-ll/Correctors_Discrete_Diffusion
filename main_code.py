@@ -4,8 +4,6 @@ from collections import Counter
 from scipy.special import logsumexp
 import pickle
 import json
-from plotting_functions import plot_method_comparison
-from saving_experiments import save_samples, load_samples
 import os
 
 # Generating Data and storing class
@@ -442,7 +440,7 @@ def add_gillespie_reverse(samples, w, mu, beta, T):
     print("Running Gillespie reverse process...")
     rng = np.random.default_rng()
     for m in range(n_mc):
-        if m % 10000 == 0:
+        if m % 100_000 == 0:
             print(f"  Gillespie particle {m}/{n_mc}")
         
         final_state, times, ckpt_samples = gillespie_reverse_masked(
@@ -1398,7 +1396,7 @@ def add_tau_leap_reverse(samples, w, mu, beta, T, tau,
     rng = np.random.default_rng()
     
     for m in range(n_mc):
-        if m % 10_000 == 0:
+        if m % 100_000 == 0:
             print(f"  Tau-leap particle {m}/{n_mc}")
         
         final_state, times, ckpt_samples = tau_leap_reverse_masked(
@@ -1415,6 +1413,58 @@ def add_tau_leap_reverse(samples, w, mu, beta, T, tau,
         # Direct assignment (fast!)
         for k, t in enumerate(times):
             samples.reverse_methods[method_name][float(t)][m] = ckpt_samples[k]
+
+## Measuring hellinger
+def compute_empirical_joint_pmf(particles, N, L, MASK=-1):
+    """
+    Compute empirical PMF over JOINT states.
+    
+    Parameters
+    ----------
+    particles : np.ndarray, shape (n_mc, N)
+        Particle samples
+    N : int
+        Number of dimensions
+    L : int
+        Vocabulary size
+    MASK : int
+        Mask token value
+    
+    Returns
+    -------
+    states : np.ndarray, shape (n_unique, N)
+        Unique states observed
+    probs : np.ndarray, shape (n_unique,)
+        Probability of each state
+    """
+    # Get unique states and their counts
+    unique_states, counts = np.unique(particles, axis=0, return_counts=True)
+    probs = counts / particles.shape[0]
+    
+    return unique_states, probs
+
+
+def compute_hellinger_from_joint_pmfs(states_a, probs_a, states_b, probs_b):
+    """
+    Compute Hellinger distance between two joint PMFs.
+    
+    This is the canonical implementation used everywhere.
+    """
+    # Build dicts for lookup
+    keys_a = {tuple(s): p for s, p in zip(states_a, probs_a)}
+    keys_b = {tuple(s): p for s, p in zip(states_b, probs_b)}
+    all_keys = set(keys_a) | set(keys_b)
+    
+    h2 = 0.0
+    for key in all_keys:
+        pa = keys_a.get(key, 0.0)
+        pb = keys_b.get(key, 0.0)
+        h2 += (np.sqrt(pa) - np.sqrt(pb)) ** 2
+    
+    return np.sqrt(0.5 * h2)
+
+
+
 ## Sample Container and Analysis
 class DiffusionSamples:
     """
@@ -1533,37 +1583,51 @@ class DiffusionSamples:
 
     # More efficient
 
+    # def hellinger_distance(self, particles_a, particles_b):
+    #     """
+    #     Fast Hellinger distance computation by aligning unique states.
+        
+    #     Parameters
+    #     ----------
+    #     particles_a, particles_b : np.ndarray, shape (n_mc, N)
+    #         Arrays of particle samples
+        
+    #     Returns
+    #     -------
+    #     distance : float
+    #         Hellinger distance
+    #     """
+    #     states_a, probs_a = self.particles_to_pmf(particles_a)
+    #     states_b, probs_b = self.particles_to_pmf(particles_b)
+        
+    #     # Build dicts for lookup
+    #     keys_a = {tuple(s): p for s, p in zip(states_a, probs_a)}
+    #     keys_b = {tuple(s): p for s, p in zip(states_b, probs_b)}
+        
+    #     all_keys = set(keys_a) | set(keys_b)
+        
+    #     h2 = 0.0
+    #     for key in all_keys:
+    #         pa = keys_a.get(key, 0.0)
+    #         pb = keys_b.get(key, 0.0)
+    #         h2 += (np.sqrt(pa) - np.sqrt(pb)) ** 2
+        
+    #     return np.sqrt(0.5 * h2)
+    
     def hellinger_distance(self, particles_a, particles_b):
         """
         Fast Hellinger distance computation by aligning unique states.
-        
-        Parameters
-        ----------
-        particles_a, particles_b : np.ndarray, shape (n_mc, N)
-            Arrays of particle samples
-        
-        Returns
-        -------
-        distance : float
-            Hellinger distance
+        Uses the canonical implementation.
         """
-        states_a, probs_a = self.particles_to_pmf(particles_a)
-        states_b, probs_b = self.particles_to_pmf(particles_b)
+        states_a, probs_a = compute_empirical_joint_pmf(
+            particles_a, self.metadata['N'], L=3, MASK=-1
+        )
+        states_b, probs_b = compute_empirical_joint_pmf(
+            particles_b, self.metadata['N'], L=3, MASK=-1
+        )
         
-        # Build dicts for lookup
-        keys_a = {tuple(s): p for s, p in zip(states_a, probs_a)}
-        keys_b = {tuple(s): p for s, p in zip(states_b, probs_b)}
-        
-        all_keys = set(keys_a) | set(keys_b)
-        
-        h2 = 0.0
-        for key in all_keys:
-            pa = keys_a.get(key, 0.0)
-            pb = keys_b.get(key, 0.0)
-            h2 += (np.sqrt(pa) - np.sqrt(pb)) ** 2
-        
-        return np.sqrt(0.5 * h2)
-    
+        return compute_hellinger_from_joint_pmfs(states_a, probs_a, states_b, probs_b)
+
     def compute_hellinger_distances(self, method_name):
         """
         Compute Hellinger distance at each checkpoint for a specific method.

@@ -1,27 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from main_code import compute_hellinger_from_joint_pmfs
 
 
-def compute_hellinger_from_pmfs(pmf1, pmf2):
-    """
-    Compute Hellinger distance between two PMFs.
-    
-    Parameters
-    ----------
-    pmf1, pmf2 : np.ndarray, shape (N, L+1)
-        Probability mass functions (last column is MASK)
-    
-    Returns
-    -------
-    float
-        Hellinger distance
-    """
-    # Flatten PMFs
-    p = pmf1.flatten()
-    q = pmf2.flatten()
-    
-    # Hellinger distance
-    return np.sqrt(0.5 * np.sum((np.sqrt(p) - np.sqrt(q)) ** 2))
 
 
 def plot_method_comparison(samples, methods=None, filename='diffusion_comparison_all_methods.png', 
@@ -72,15 +53,20 @@ def plot_method_comparison(samples, methods=None, filename='diffusion_comparison
             if invalid:
                 raise ValueError(f"Methods not found: {invalid}. Available: {available_methods}")
         
-        # Compute Hellinger distances from PMFs
-        print("Computing Hellinger distances from PMFs...")
+        # Compute Hellinger distances from joint PMFs
+        print("Computing Hellinger distances from joint PMFs...")
         all_distances = {}
         for method in available_methods:
             all_distances[method] = {}
             for t in times:
                 forward_pmf = samples['forward_pmfs'][float(t)]
                 reverse_pmf = samples['reverse_pmfs'][method][float(t)]
-                all_distances[method][float(t)] = compute_hellinger_from_pmfs(forward_pmf, reverse_pmf)
+                
+                # Use the canonical function
+                all_distances[method][float(t)] = compute_hellinger_from_joint_pmfs(
+                    forward_pmf['states'], forward_pmf['probs'],
+                    reverse_pmf['states'], reverse_pmf['probs']
+                )
         
     else:
         # Full DiffusionSamples object
@@ -206,8 +192,7 @@ def plot_gillespie_nmc_comparison(
     results : dict
         Final Hellinger distances for each n_mc
     """
-    import matplotlib.pyplot as plt
-    import numpy as np
+
     
     fig, ax = plt.subplots(figsize=figsize)
     
@@ -242,8 +227,12 @@ def plot_gillespie_nmc_comparison(
             for t in times:
                 forward_pmf = samples['forward_pmfs'][float(t)]
                 reverse_pmf = samples['reverse_pmfs'][gillespie_method][float(t)]
-                distances_dict[float(t)] = compute_hellinger_from_pmfs(forward_pmf, reverse_pmf)
-            
+                
+                # Use the canonical function
+                distances_dict[float(t)] = compute_hellinger_from_joint_pmfs(
+                    forward_pmf['states'], forward_pmf['probs'],
+                    reverse_pmf['states'], reverse_pmf['probs']
+                )
         else:
             # Full DiffusionSamples object
             times = samples.times

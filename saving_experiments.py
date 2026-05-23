@@ -2,39 +2,7 @@ import os
 import pickle
 import json
 import numpy as np
-
-
-def compute_empirical_pmf(particles, N, L, MASK=-1):
-    """
-    Compute empirical PMF from particle samples.
-    
-    Parameters
-    ----------
-    particles : np.ndarray, shape (n_mc, N)
-        Particle samples
-    N : int
-        Number of dimensions
-    L : int
-        Vocabulary size
-    MASK : int
-        Mask token value
-    
-    Returns
-    -------
-    pmf : np.ndarray, shape (N, L+1)
-        Empirical probability mass function
-        Last column (index L) is for MASK token
-    """
-    n_mc = particles.shape[0]
-    pmf = np.zeros((N, L + 1))  # +1 for MASK
-    
-    for d in range(N):
-        for val in range(L):
-            pmf[d, val] = np.sum(particles[:, d] == val) / n_mc
-        # MASK probability
-        pmf[d, L] = np.sum(particles[:, d] == MASK) / n_mc
-    
-    return pmf
+from main_code import compute_empirical_joint_pmf, compute_hellinger_from_joint_pmfs
 
 
 def save_samples(samples, filename, metadata=None, create_folder=True, 
@@ -71,30 +39,32 @@ def save_samples(samples, filename, metadata=None, create_folder=True,
         if L is None:
             raise ValueError("L (vocabulary size) is required for lightweight save")
         
-        print("Computing empirical PMFs for lightweight save...")
-        N = samples.metadata['N']
+        print("Computing empirical joint PMFs for lightweight save...")
+        N = samples.metadata['N']  # ← GET N FROM METADATA
         MASK = -1  # Assuming MASK=-1
         
-        # Compute PMFs for forward samples
+        # Compute JOINT PMFs for forward samples
         forward_pmfs = {}
         for t in samples.times:
             particles = samples.forward[float(t)]
-            forward_pmfs[float(t)] = compute_empirical_pmf(particles, N, L, MASK)
+            states, probs = compute_empirical_joint_pmf(particles, N, L, MASK)
+            forward_pmfs[float(t)] = {'states': states, 'probs': probs}
         
-        # Compute PMFs for reverse methods
+        # Compute JOINT PMFs for reverse methods
         reverse_pmfs = {}
         for method in samples.list_methods():
             reverse_pmfs[method] = {}
             for t in samples.times:
                 particles = samples.reverse_methods[method][float(t)]
-                reverse_pmfs[method][float(t)] = compute_empirical_pmf(particles, N, L, MASK)
+                states, probs = compute_empirical_joint_pmf(particles, N, L, MASK)
+                reverse_pmfs[method][float(t)] = {'states': states, 'probs': probs}
         
         data = {
             'times': samples.times,
             'metadata': samples.metadata.copy(),
             'forward_pmfs': forward_pmfs,
             'reverse_pmfs': reverse_pmfs,
-            'L': L,  # Store vocab size for reconstruction
+            'L': L,
             'lightweight': True
         }
     else:
@@ -119,7 +89,7 @@ def save_samples(samples, filename, metadata=None, create_folder=True,
     file_size_mb = os.path.getsize(filepath) / (1024 * 1024)
     
     if lightweight:
-        print(f"Samples saved (LIGHTWEIGHT - PMFs) to: {filename}")
+        print(f"Samples saved (LIGHTWEIGHT - Joint PMFs) to: {filename}")
         print(f"  - Forward PMFs: {len(forward_pmfs)} checkpoints")
         print(f"  - Reverse PMFs: {len(reverse_pmfs)} methods")
         print(f"  - File size: {file_size_mb:.2f} MB")
@@ -132,7 +102,6 @@ def save_samples(samples, filename, metadata=None, create_folder=True,
     print(f"  - n_mc: {data['metadata']['n_mc']}, N: {data['metadata']['N']}")
     if metadata:
         print(f"  - User metadata: {list(metadata.keys())}")
-
 
 def load_samples(filename, from_folder=True):
     """
@@ -204,3 +173,62 @@ def load_samples(filename, from_folder=True):
             print(f"  - User metadata: {list(user_metadata.keys())}")
         
         return samples, user_metadata
+    
+
+def save_samples_summary(samples, filename, metadata=None, create_folder=True):
+    """
+    Save a human-readable JSON summary (without the actual particle data).
+    
+    Parameters
+    ----------
+    samples : DiffusionSamples or dict
+        The samples object (full) or data dict (lightweight)
+    filename : str
+        Output filename (will add .json extension if not present)
+    metadata : dict, optional
+        Additional metadata to include
+    create_folder : bool, optional
+        If True, saves in folder named after filename
+    """
+    base_name = filename.replace('.pkl', '').replace('.json', '')
+    
+    if create_folder:
+        folder = base_name
+        os.makedirs(folder, exist_ok=True)
+        filepath = os.path.join(folder, base_name + '_summary.json')
+    else:
+        filepath = base_name + '_summary.json'
+    
+    # Handle both DiffusionSamples objects and lightweight dicts
+    if isinstance(samples, dict):
+        # Lightweight format
+        summary = {
+            'n_mc': int(samples['metadata']['n_mc']),
+            'N': int(samples['metadata']['N']),
+            'L': int(samples.get('L', 0)),
+            'n_checkpoints': len(samples['times']),
+            'time_range': [float(samples['times'][0]), float(samples['times'][-1])],
+            'methods': list(samples.get('reverse_pmfs', {}).keys()),
+            'lightweight': True,
+            'storage_format': 'PMFs (empirical probability mass functions)'
+        }
+    else:
+        # Full DiffusionSamples object
+        summary = {
+            'n_mc': int(samples.metadata['n_mc']),
+            'N': int(samples.metadata['N']),
+            'n_checkpoints': len(samples.times),
+            'time_range': [float(samples.times[0]), float(samples.times[-1])],
+            'reverse_methods': samples.list_methods(),
+            'forward_checkpoints': sorted([float(t) for t in samples.forward.keys()]),
+            'lightweight': False,
+            'storage_format': 'Full particle samples'
+        }
+    
+    if metadata is not None:
+        summary['user_metadata'] = metadata
+    
+    with open(filepath, 'w') as f:
+        json.dump(summary, f, indent=2)
+    
+    print(f"Summary saved to: {filepath}")
