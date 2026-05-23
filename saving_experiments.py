@@ -1,6 +1,9 @@
 import os
 import pickle
 import json
+
+
+
 def save_samples(samples, filename, metadata=None, create_folder = True):
     """
     Save DiffusionSamples object to disk with all data and metadata.
@@ -65,7 +68,7 @@ def load_samples(filename, from_folder=True):
     user_metadata : dict or None
         User-provided metadata if it was saved
     """
-
+    from main_code import DiffusionSamples 
     base_name = filename.replace('.pkl', '')
     if from_folder:
         filepath = os.path.join(base_name, base_name + '.pkl')

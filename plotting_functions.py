@@ -156,6 +156,115 @@ def plot_method_comparison(samples, methods=None, filename='diffusion_comparison
         # **Set return_dstances=True to get the distance dict for all methods**``
 
 
+# def plot_gillespie_nmc_comparison(
+#     samples_dict,
+#     time_start=0.0,
+#     time_end=None,
+#     filename='gillespie_nmc_comparison.png',
+#     show_annotations=True,
+#     figsize=(12, 8)
+# ):
+#     """
+#     Compare Gillespie method across different n_mc values.
+    
+#     Parameters
+#     ----------
+#     samples_dict : dict
+#         Dictionary mapping n_mc values to DiffusionSamples objects
+#         Example: {1000: samples_1k, 10000: samples_10k, 100000: samples_100k}
+#     time_start : float
+#         Start time for plotting
+#     time_end : float or None
+#         End time for plotting (None = use max time)
+#     filename : str
+#         Output filename for plot
+#     show_annotations : bool
+#         Whether to show final Hellinger values as annotations
+#     figsize : tuple
+#         Figure size (width, height)
+    
+#     Returns
+#     -------
+#     fig, ax : matplotlib figure and axis objects
+#     """
+#     import matplotlib.pyplot as plt
+#     import numpy as np
+    
+#     fig, ax = plt.subplots(figsize=figsize)
+    
+#     # Store results for potential return
+#     results = {}
+    
+#     # Sort by n_mc for consistent ordering
+#     sorted_items = sorted(samples_dict.items(), key=lambda x: x[0])
+    
+#     for n_mc, samples in sorted_items:
+#         # Find Gillespie method in this samples object
+#         gillespie_method = None
+#         for method_name in samples.list_methods():
+#             if 'gillespie' in method_name.lower():
+#                 gillespie_method = method_name
+#                 break
+        
+#         if gillespie_method is None:
+#             print(f"Warning: No Gillespie method found for n_mc={n_mc}, skipping")
+#             continue
+        
+#         # Compute Hellinger distances
+#         distances = samples.compute_hellinger_distances(gillespie_method)
+#         times = samples.times
+        
+#         # Filter by time range
+#         if time_end is None:
+#             time_end = times[-1]
+        
+#         mask = (times >= time_start) & (times <= time_end)
+#         times_plot = times[mask]
+#         distances_plot = distances[mask]
+        
+#         # Plot with label showing only n_mc
+#         label = f"n_mc={n_mc}"
+#         line, = ax.plot(times_plot, distances_plot, marker='o', label=label, linewidth=2)
+        
+#         # Store final Hellinger value
+#         final_hellinger = distances_plot[-1]
+#         results[n_mc] = final_hellinger
+        
+#         # Add annotation at final point
+#         if show_annotations and len(times_plot) > 0:
+#             ax.annotate(
+#                 f'n_mc={n_mc}: H={final_hellinger:.3f}',
+#                 xy=(times_plot[-1], distances_plot[-1]),
+#                 xytext=(10, 0),
+#                 textcoords='offset points',
+#                 fontsize=9,
+#                 color=line.get_color(),
+#                 bbox=dict(boxstyle='round,pad=0.3', facecolor='white', 
+#                          edgecolor=line.get_color(), alpha=0.7)
+#             )
+    
+#     # Formatting
+#     ax.set_xlabel('Physical time t', fontsize=12)
+#     ax.set_ylabel('Hellinger distance', fontsize=12)
+#     ax.set_title('Gillespie Sampler: Convergence vs n_mc\nComparing Different Monte Carlo Sample Sizes', 
+#                  fontsize=14, fontweight='bold')
+#     ax.grid(True, alpha=0.3)
+#     ax.legend(loc='best', fontsize=10)
+    
+#     # Add horizontal line at y=0
+#     ax.axhline(y=0, color='gray', linestyle='--', linewidth=1, alpha=0.5)
+    
+#     plt.tight_layout()
+    
+#     # Save
+#     if filename:
+#         plt.savefig(filename, dpi=300, bbox_inches='tight')
+#         print(f"Plot saved to: {filename}")
+    
+#     plt.show()
+    
+#     return fig, ax, results
+
 def plot_gillespie_nmc_comparison(
     samples_dict,
     time_start=0.0,
@@ -210,9 +319,12 @@ def plot_gillespie_nmc_comparison(
             print(f"Warning: No Gillespie method found for n_mc={n_mc}, skipping")
             continue
         
-        # Compute Hellinger distances
-        distances = samples.compute_hellinger_distance(gillespie_method)
+        # Compute Hellinger distances (returns a dict!)
+        distances_dict = samples.compute_hellinger_distances(gillespie_method)
+        
+        # Convert to arrays
         times = samples.times
+        distances = np.array([distances_dict[float(t)] for t in times])
         
         # Filter by time range
         if time_end is None:
