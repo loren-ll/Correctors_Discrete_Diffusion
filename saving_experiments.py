@@ -1,12 +1,46 @@
 import os
 import pickle
 import json
+import numpy as np
 
 
-
-def save_samples(samples, filename, metadata=None, create_folder = True):
+def compute_empirical_pmf(particles, N, L, MASK=-1):
     """
-    Save DiffusionSamples object to disk with all data and metadata.
+    Compute empirical PMF from particle samples.
+    
+    Parameters
+    ----------
+    particles : np.ndarray, shape (n_mc, N)
+        Particle samples
+    N : int
+        Number of dimensions
+    L : int
+        Vocabulary size
+    MASK : int
+        Mask token value
+    
+    Returns
+    -------
+    pmf : np.ndarray, shape (N, L+1)
+        Empirical probability mass function
+        Last column (index L) is for MASK token
+    """
+    n_mc = particles.shape[0]
+    pmf = np.zeros((N, L + 1))  # +1 for MASK
+    
+    for d in range(N):
+        for val in range(L):
+            pmf[d, val] = np.sum(particles[:, d] == val) / n_mc
+        # MASK probability
+        pmf[d, L] = np.sum(particles[:, d] == MASK) / n_mc
+    
+    return pmf
+
+
+def save_samples(samples, filename, metadata=None, create_folder=True, 
+                 lightweight=False, L=None):
+    """
+    Save DiffusionSamples object to disk.
     
     Parameters
     ----------
@@ -15,26 +49,63 @@ def save_samples(samples, filename, metadata=None, create_folder = True):
     filename : str
         Output filename (will add .pkl extension if not present)
     metadata : dict, optional
-        Additional metadata to save (e.g., w, mu, beta, T, tau values)
-        Example: {'beta': 5.0, 'T': 3.5, 'tau_values': [0.01, 0.05]}
+        Additional metadata to save
+    create_folder : bool
+        If True, creates a folder with base name
+    lightweight : bool
+        If True, only save empirical PMFs (not full particle data)
+        Requires L parameter
+    L : int, optional
+        Vocabulary size (required if lightweight=True)
     """
     base_name = filename.replace('.pkl', '')
     
     if create_folder:
-        # Create folder with the base name
         folder = base_name
         os.makedirs(folder, exist_ok=True)
         filepath = os.path.join(folder, base_name + '.pkl')
     else:
         filepath = base_name + '.pkl'
     
-    # Prepare data to save
-    data = {
-        'times': samples.times,
-        'forward': samples.forward,
-        'reverse_methods': samples.reverse_methods,
-        'metadata': samples.metadata.copy(),  # n_mc, N, etc.
-    }
+    if lightweight:
+        if L is None:
+            raise ValueError("L (vocabulary size) is required for lightweight save")
+        
+        print("Computing empirical PMFs for lightweight save...")
+        N = samples.metadata['N']
+        MASK = -1  # Assuming MASK=-1
+        
+        # Compute PMFs for forward samples
+        forward_pmfs = {}
+        for t in samples.times:
+            particles = samples.forward[float(t)]
+            forward_pmfs[float(t)] = compute_empirical_pmf(particles, N, L, MASK)
+        
+        # Compute PMFs for reverse methods
+        reverse_pmfs = {}
+        for method in samples.list_methods():
+            reverse_pmfs[method] = {}
+            for t in samples.times:
+                particles = samples.reverse_methods[method][float(t)]
+                reverse_pmfs[method][float(t)] = compute_empirical_pmf(particles, N, L, MASK)
+        
+        data = {
+            'times': samples.times,
+            'metadata': samples.metadata.copy(),
+            'forward_pmfs': forward_pmfs,
+            'reverse_pmfs': reverse_pmfs,
+            'L': L,  # Store vocab size for reconstruction
+            'lightweight': True
+        }
+    else:
+        # Full save (default)
+        data = {
+            'times': samples.times,
+            'forward': samples.forward,
+            'reverse_methods': samples.reverse_methods,
+            'metadata': samples.metadata.copy(),
+            'lightweight': False
+        }
     
     # Add user-provided metadata
     if metadata is not None:
@@ -44,9 +115,20 @@ def save_samples(samples, filename, metadata=None, create_folder = True):
     with open(filepath, 'wb') as f:
         pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
     
-    print(f"Samples saved to: {filename}")
-    print(f"  - Forward samples: {len(data['forward'])} checkpoints")
-    print(f"  - Reverse methods: {list(data['reverse_methods'].keys())}")
+    # Get file size
+    file_size_mb = os.path.getsize(filepath) / (1024 * 1024)
+    
+    if lightweight:
+        print(f"Samples saved (LIGHTWEIGHT - PMFs) to: {filename}")
+        print(f"  - Forward PMFs: {len(forward_pmfs)} checkpoints")
+        print(f"  - Reverse PMFs: {len(reverse_pmfs)} methods")
+        print(f"  - File size: {file_size_mb:.2f} MB")
+    else:
+        print(f"Samples saved (FULL) to: {filename}")
+        print(f"  - Forward samples: {len(data['forward'])} checkpoints")
+        print(f"  - Reverse methods: {list(data['reverse_methods'].keys())}")
+        print(f"  - File size: {file_size_mb:.2f} MB")
+    
     print(f"  - n_mc: {data['metadata']['n_mc']}, N: {data['metadata']['N']}")
     if metadata:
         print(f"  - User metadata: {list(metadata.keys())}")
@@ -56,136 +138,69 @@ def load_samples(filename, from_folder=True):
     """
     Load DiffusionSamples object from disk.
     
+    Automatically detects if the file is lightweight (PMFs) or full (particles).
+    
     Parameters
     ----------
     filename : str
         Input filename
+    from_folder : bool
+        If True, looks for file inside a folder with the same base name
     
     Returns
     -------
-    samples : DiffusionSamples
-        Reconstructed samples object
+    samples : DiffusionSamples or dict
+        If full: reconstructed DiffusionSamples object
+        If lightweight: dict with PMFs and metadata
     user_metadata : dict or None
         User-provided metadata if it was saved
     """
     from main_code import DiffusionSamples 
+    
     base_name = filename.replace('.pkl', '')
     if from_folder:
         filepath = os.path.join(base_name, base_name + '.pkl')
     else:
         filepath = base_name + '.pkl'
     
-    
     # Load from pickle
     with open(filepath, 'rb') as f:
         data = pickle.load(f)
     
-    # Reconstruct DiffusionSamples object
-    times = data['times']
-    n_mc = data['metadata']['n_mc']
-    N = data['metadata']['N']
+    # Check if lightweight
+    is_lightweight = data.get('lightweight', False)
     
-    samples = DiffusionSamples(times, n_mc, N)
-    samples.forward = data['forward']
-    samples.reverse_methods = data['reverse_methods']
-    samples.metadata = data['metadata']
+    if is_lightweight:
+        # Lightweight format - return as dict with PMFs
+        print(f"Samples loaded (LIGHTWEIGHT - PMFs) from: {filename}")
+        print(f"  - Forward PMFs: {len(data['forward_pmfs'])} checkpoints")
+        print(f"  - Reverse PMFs: {len(data['reverse_pmfs'])} methods")
+        print(f"  - n_mc: {data['metadata']['n_mc']}, N: {data['metadata']['N']}, L: {data['L']}")
+        
+        user_metadata = data.get('user_metadata', None)
+        if user_metadata:
+            print(f"  - User metadata: {list(user_metadata.keys())}")
+        
+        return data, user_metadata
     
-    # Extract user metadata if present
-    user_metadata = data.get('user_metadata', None)
-    
-    print(f"Samples loaded from: {filename}")
-    print(f"  - Forward samples: {len(samples.forward)} checkpoints")
-    print(f"  - Reverse methods: {samples.list_methods()}")
-    print(f"  - n_mc: {n_mc}, N: {N}")
-    if user_metadata:
-        print(f"  - User metadata: {list(user_metadata.keys())}")
-    
-    return samples, user_metadata
-
-
-def save_samples_summary(samples, filename, metadata=None, create_folder=True):
-    """
-    Save a human-readable JSON summary (without the actual particle data).
-    
-    Parameters
-    ----------
-    samples : DiffusionSamples
-        The samples object
-    filename : str
-        Output filename (will add .json extension if not present)
-    metadata : dict, optional
-        Additional metadata to include
-    create_folder : bool, optional
-        If True, saves in folder named after filename
-    """
-    base_name = filename.replace('.pkl', '').replace('.json', '')
-    
-    if create_folder:
-        folder = base_name
-        os.makedirs(folder, exist_ok=True)
-        filepath = os.path.join(folder, base_name + '_summary.json')
     else:
-        filepath = base_name + '_summary.json'
-    
-    summary = {
-        'n_mc': int(samples.metadata['n_mc']),
-        'N': int(samples.metadata['N']),
-        'n_checkpoints': len(samples.times),
-        'time_range': [float(samples.times[0]), float(samples.times[-1])],
-        'reverse_methods': samples.list_methods(),
-        'forward_checkpoints': sorted([float(t) for t in samples.forward.keys()]),
-    }
-    
-    if metadata is not None:
-        summary['user_metadata'] = metadata
-    
-    with open(filepath, 'w') as f:
-        json.dump(summary, f, indent=2)
-    
-    print(f"Summary saved to: {filepath}")
-
-
-# ==========================================================================================================
-# Code to save
-# ==========================================================================================================
-
-    # # Prepare metadata
-#     experiment_metadata = {
-#         'N': N,
-#         'L': L,
-#         'r': r,
-#         'beta': beta,
-#         'T': T,
-#         'n_mc': n_mc,
-#         'tau_values': [0.5, 0.1, 0.05, 0.01, 0.005, 0.001],
-#         'w': w.tolist(),
-#         'mu_shape': mu.shape,
-#         'checkpoint_formula': 'T * (u ** 12) where u = linspace(0, 1, 31)',
-#         'n_checkpoints': len(checkpoint_times),
-#         'methods': samples_2.list_methods(),
-#         'date': '2026-05-20',
-#         'notes': 'Gillespie vs tau-leaping comparison with 6 tau values'
-#     }
-    
-#     # Save full data
-#     save_samples(samples_2, 'experiment_N8_L3_beta5_T3.5.pkl', metadata=experiment_metadata)
-    
-#     # Save summary
-#     save_samples_summary(samples_2, 'experiment_N8_L3_beta5_T3.5_summary.json', 
-#                         metadata=experiment_metadata)
-    
-
-
-# ==========================================================================================================
-# Code to reload
-# ==========================================================================================================
-# # Load the saved experiment
-# loaded_samples, metadata = load_samples('experiment_N8_L3_beta5_T3.5.pkl')
-
-# print(f"Loaded: N={metadata['N']}, beta={metadata['beta']}, methods={metadata['methods']}")
-
-# # Continue analysis
-# plot_method_comparison(loaded_samples, methods=['gillespie', 'tau_leap_0.01', 'tau_leap_0.1'])
-
-
-
+        # Full format - reconstruct DiffusionSamples object
+        times = data['times']
+        n_mc = data['metadata']['n_mc']
+        N = data['metadata']['N']
+        
+        samples = DiffusionSamples(times, n_mc, N)
+        samples.forward = data['forward']
+        samples.reverse_methods = data['reverse_methods']
+        samples.metadata = data['metadata']
+        
+        user_metadata = data.get('user_metadata', None)
+        
+        print(f"Samples loaded (FULL) from: {filename}")
+        print(f"  - Forward samples: {len(samples.forward)} checkpoints")
+        print(f"  - Reverse methods: {samples.list_methods()}")
+        print(f"  - n_mc: {n_mc}, N: {N}")
+        if user_metadata:
+            print(f"  - User metadata: {list(user_metadata.keys())}")
+        
+        return samples, user_metadata
