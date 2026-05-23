@@ -5,7 +5,7 @@ from scipy.special import logsumexp
 import pickle
 import json
 from plotting_functions import plot_method_comparison
-from saving_experiments import save_samples, save_samples_summary, load_samples
+from saving_experiments import save_samples, load_samples
 import os
 
 # Generating Data and storing class
