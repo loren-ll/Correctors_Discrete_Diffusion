@@ -867,6 +867,20 @@ def apply_corrector(
         )
         
         return x_corrected
+    elif method == 'DPC':
+        n_corr = hyperparameters.get('n_corr', 8)
+        gamma = hyperparameters.get('gamma', 1.0)
+        unmasking_prob_fn = hyperparameters.get('unmasking_prob_fn')
+        x_corrected = dpc_corrector_step(
+            x=x,
+            unmasking_prob_fn=unmasking_prob_fn,
+            beta=beta,
+            MASK=MASK,
+            rng=rng,
+            n_corr = n_corr,
+            gamma = gamma
+        )
+        return x_corrected
     else:
         raise ValueError(f"Unknown corrector method: {method}")
 #### Random Masking - Campbell et al.
@@ -1173,6 +1187,81 @@ def informed_corrector_step(
             x[d] = rng.choice(len(probs[d]), p=probs[d])
     
     return x
+
+
+def dpc_corrector_step(
+    x,
+    unmasking_prob_fn,
+    beta,
+    n_corr,
+    gamma=1.0,
+    MASK=-1,
+    rng=None
+):
+    N = len(x)
+    L = unmasking_prob_fn(x).shape[1] - 1  # Infer L from probs shape
+
+    # k = number of tokens to keep UNMASKED
+    # = number of currently unmasked tokens in x after predictor step
+    # This is the natural equivalent of floor(β(t-1) · D) in their discrete setting
+  
+    k =  int(np.sum(x != MASK))
+    k = np.clip(k, 0, N)
+
+    # Start from x_hat_0: denoise all masked positions first
+    x_hat_0 = x.copy()
+    for d in range(N):
+        if x_hat_0[d] == MASK:
+            probs = unmasking_prob_fn(x_hat_0)
+            token_probs = probs[d, :L]
+            token_probs = token_probs / token_probs.sum()
+            x_hat_0[d] = rng.choice(L, p=token_probs)
+
+    x = x_hat_0.copy()
+
+    for j in range(n_corr):
+        # ===== Get corrector logits =====
+        # logit_d = log p(x_d | x_{-d})
+        logits = np.zeros(N)
+
+        for d in range(N):
+            x_masked_d = x.copy()
+            x_masked_d[d] = MASK
+            probs = unmasking_prob_fn(x_masked_d) 
+            token_d = x[d]
+            logits[d] = np.log(probs[d, token_d] + 1e-10)
+
+        # ===== Gumbel noise =====
+        u = rng.uniform(0, 1, size=N)
+        u = np.clip(u, 1e-10, 1 - 1e-10)
+        gumbel_noise = -gamma * np.log(-np.log(u))
+
+        # ===== Perturbed logits =====
+        r = logits + gumbel_noise
+
+        # ===== Top-k positions to keep unmasked =====
+        if k > 0:
+            top_k_indices = np.argsort(r)[-k:]
+        else:
+            top_k_indices = np.array([], dtype=int)
+
+        # ===== Apply mask =====
+        x_new = np.full(N, MASK, dtype=x.dtype)
+        x_new[top_k_indices] = x[top_k_indices]
+        x = x_new
+
+        # ===== Re-denoise for next iteration =====
+        if j < n_corr - 1:
+            for d in range(N):
+                if x[d] == MASK:
+                    probs = unmasking_prob_fn(x)  # ← Same function again!
+                    token_probs = probs[d, :L]
+                    token_probs = token_probs / token_probs.sum()
+                    x[d] = rng.choice(L, p=token_probs)
+
+    return x
+
+
 ### Tau-Leap + Correctors
 def tau_leap_reverse_masked(
     N, w, mu, beta, T=1.0, tau=0.01, MASK=-1, rng=None,
@@ -1196,7 +1285,7 @@ def tau_leap_reverse_masked(
             raise ValueError("corrector_start must be provided when corrector=True")
         if corrector_hyperparameters is None:
             raise ValueError("corrector_hyperparameters must be provided when corrector=True")
-        if corrector_method == "PRISM":
+        if corrector_method in ("PRISM", "informed_corrector", "DPC"):
             corrector_hyperparameters['unmasking_prob_fn'] = unmasking_prob_fn
     
     # Normalize checkpoint times
@@ -1377,6 +1466,10 @@ def add_tau_leap_reverse(samples, w, mu, beta, T, tau,
             method_name += f"_K_{K}_ncorr_{n_corr}_gamma_{gamma}"
             if use_margin:
                 method_name += "_margin"
+        elif corrector_method == 'DPC':
+            n_corr = corrector_hyperparameters.get('n_corr', 8)
+            gamma = corrector_hyperparameters.get('gamma', 1.0)
+            method_name += f"_ncorr_{n_corr}_gamma_{gamma}"
     else:
         method_name = f"tau_leap_{tau}"
     
