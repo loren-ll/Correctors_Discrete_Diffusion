@@ -46,6 +46,7 @@ print(f"Methods already in samples: {already_done}")
 
 # ── 1. Plain tau-leaping (no corrector) ──────────────────────────────────────
 # tau_values = [4, 3, 2, 1, 0.8, 0.7, 0.6, 0.5, 0.4, 0.2, 0.1, 0.08]
+tau_values = [0.6, 1]
 
 # ── 2. Tau-leaping + corrector grid ──────────────────────────────────────────
 # Each entry is a dict describing one (tau, corrector) combination.
