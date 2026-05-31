@@ -217,47 +217,48 @@ corrector_configs = [
     {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
     {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
     {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.2, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
-    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
+    
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.2, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
+    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
 
 
 
@@ -341,18 +342,18 @@ corrector_configs = [
 # ═════════════════════════════════════════════════════════════════════════════
 
 # ── Plain tau-leaping ─────────────────────────────────────────────────────────
-for tau in tau_values:
-    method_name = f"tau_leap_{tau}"
-    if method_name in already_done:
-        print(f"Skipping {method_name} (already in samples)")
-        continue
-    print(f"\n--- Plain tau-leaping: tau={tau} ---")
-    add_tau_leap_reverse(
-        samples, w, mu, beta, T,
-        tau=tau,
-        corrector=False,
-        n_jobs=args.n_jobs
-    )
+# for tau in tau_values:
+#     method_name = f"tau_leap_{tau}"
+#     if method_name in already_done:
+#         print(f"Skipping {method_name} (already in samples)")
+#         continue
+#     print(f"\n--- Plain tau-leaping: tau={tau} ---")
+#     add_tau_leap_reverse(
+#         samples, w, mu, beta, T,
+#         tau=tau,
+#         corrector=False,
+#         n_jobs=args.n_jobs
+#     )
 
 # ── Tau-leaping + correctors ──────────────────────────────────────────────────
 for cfg in corrector_configs:
