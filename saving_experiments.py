@@ -65,7 +65,8 @@ def save_samples(samples, filename, metadata=None, create_folder=True,
             'forward_pmfs': forward_pmfs,
             'reverse_pmfs': reverse_pmfs,
             'L': L,
-            'lightweight': True
+            'lightweight': True,
+            'nfe': samples.nfe
         }
     else:
         # Full save (default)
@@ -74,7 +75,8 @@ def save_samples(samples, filename, metadata=None, create_folder=True,
             'forward': samples.forward,
             'reverse_methods': samples.reverse_methods,
             'metadata': samples.metadata.copy(),
-            'lightweight': False
+            'lightweight': False,
+            'nfe': samples.nfe
         }
     
     # Add user-provided metadata
@@ -157,11 +159,13 @@ def load_samples(filename, from_folder=True):
         times = data['times']
         n_mc = data['metadata']['n_mc']
         N = data['metadata']['N']
+        L = data['metadata']['L']
         
-        samples = DiffusionSamples(times, n_mc, N)
+        samples = DiffusionSamples(times, n_mc, N, L)
         samples.forward = data['forward']
         samples.reverse_methods = data['reverse_methods']
         samples.metadata = data['metadata']
+        samples.nfe = data.get('nfe', {}) 
         
         user_metadata = data.get('user_metadata', None)
         
