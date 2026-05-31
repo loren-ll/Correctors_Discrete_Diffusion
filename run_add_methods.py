@@ -198,26 +198,26 @@ corrector_configs = [
     # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
     # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
 
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.2, 'use_margin': True}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': True}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
-    # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.8, 'use_margin': False}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': True}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.2, 'use_margin': False}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': True}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.5, 'use_margin': False}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': True}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 1.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 4, 'gamma': 0.8, 'use_margin': False}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.2, 'use_margin': True}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': True}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
+    {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
 
     {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
     {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
@@ -239,6 +239,11 @@ corrector_configs = [
     {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.2, 'use_margin': True}},
     {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
     {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': True}},
+
+
+
+# UNTIL HRE DONE
+
 
     # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
     # {'tau': 0.6, 'corrector_method': 'informed_corrector', 'corrector_start': 3.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
@@ -294,6 +299,8 @@ corrector_configs = [
     # {'tau': 1.0, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.2, 'use_margin': False}},
     # {'tau': 1.0, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
     # {'tau': 1.0, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
+
+
     # {'tau': 1.0, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': True}},
     # {'tau': 1.0, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 2, 'n_corr': 1, 'gamma': 0.5, 'use_margin': False}},
     # {'tau': 1.0, 'corrector_method': 'informed_corrector', 'corrector_start': 2.0, 'corrector_hyperparameters': {'K': 1, 'n_corr': 1, 'gamma': 0.8, 'use_margin': True}},
@@ -406,13 +413,13 @@ for cfg in corrector_configs:
     )
 
 # ── Save ──────────────────────────────────────────────────────────────────────
-print("\nSaving updated samples...")
-save_samples(
-    samples,
-    filename=FILENAME,
-    lightweight=False,
-    L=L,
-)
+    print("\nSaving updated samples...")
+    save_samples(
+        samples,
+        filename=FILENAME,
+        lightweight=False,
+        L=L,
+    )
 
 print("Done.")
 print(f"Methods now in samples: {samples.list_methods()}")
