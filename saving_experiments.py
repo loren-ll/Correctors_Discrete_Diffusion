@@ -2,7 +2,8 @@ import os
 import pickle
 import json
 import numpy as np
-from main_code import compute_empirical_joint_pmf, compute_hellinger_from_joint_pmfs
+from main_code_parallel import compute_empirical_joint_pmf, compute_hellinger_from_joint_pmfs
+import tempfile, shutil
 
 
 def save_samples(samples, filename, metadata=None, create_folder=True, 
@@ -84,8 +85,10 @@ def save_samples(samples, filename, metadata=None, create_folder=True,
         data['user_metadata'] = metadata
     
     # Save to pickle
-    with open(filepath, 'wb') as f:
+    tmp_path = filepath + '.tmp'
+    with open(tmp_path, 'wb') as f:
         pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+    shutil.move(tmp_path, filepath)  # atomic rename
     
     # Get file size
     file_size_mb = os.path.getsize(filepath) / (1024 * 1024)
