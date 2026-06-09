@@ -1204,7 +1204,7 @@ def dpc_corrector_step(
     rng=None
 ):
     N = len(x)
-    L = unmasking_prob_fn(x).shape[1] - 1  # Infer L from probs shape
+    L = unmasking_prob_fn(x).shape[1]   # Infer L from probs shape
 
     # k = number of tokens to keep UNMASKED
     # = number of currently unmasked tokens in x after predictor step
@@ -1880,12 +1880,11 @@ class DiffusionSamples:
         assert 1 <= k <= N, f"k must be between 1 and N={N}"
 
         # Build subset list once — reused across all time points
-        all_subsets = list(combinations(range(N), k))
-        if M >= len(all_subsets):
-            subsets = all_subsets
-        else:
-            indices = rng.choice(len(all_subsets), size=M, replace=False)
-            subsets = [all_subsets[i] for i in indices]
+        # Sample M random subsets directly
+        subsets = [
+            tuple(sorted(rng.choice(N, size=k, replace=False)))
+            for _ in range(M)
+        ]
 
         results = {}
 
@@ -1968,3 +1967,22 @@ def marginalize_joint_pmf(states, probs, subset):
 
 
 
+def compute_marginal_hellinger_t0(samples, method_name, k, M, seed=None):
+    rng = np.random.default_rng(seed)
+
+    N = samples.metadata["N"]
+
+    fwd_particles = samples.forward[0.0]
+    rev_particles = samples.reverse_methods[method_name][0.0]
+
+    hs = np.empty(M)
+
+    for m in range(M):
+        subset = rng.choice(N, size=k, replace=False)
+
+        hs[m] = samples._hellinger_from_samples(
+            fwd_particles[:, subset],
+            rev_particles[:, subset]
+        )
+
+    return hs.mean()

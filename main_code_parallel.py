@@ -1241,7 +1241,7 @@ def dpc_corrector_step(
     rng=None
 ):
     N = len(x)
-    L = unmasking_prob_fn(x).shape[1] - 1  # Infer L from probs shape
+    L = unmasking_prob_fn(x).shape[1]   # Infer L from probs shape
 
     # k = number of tokens to keep UNMASKED
     # = number of currently unmasked tokens in x after predictor step
