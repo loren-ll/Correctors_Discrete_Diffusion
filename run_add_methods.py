@@ -25,10 +25,10 @@ parser.add_argument('--n_jobs', type=int, default=-1)
 args = parser.parse_args()
 
 # ── Load existing samples ─────────────────────────────────────────────────────
-FILENAME = 'NFE_measure_N_60'
+FILENAME = 'NFE_measure_N_60_RM_tests'
 
 print(f"Loading samples from {FILENAME}...")
-samples, _ = load_samples(FILENAME)
+samples, _ = load_samples(FILENAME, from_folder = False)
 
 # Recover parameters from metadata
 w    = np.array(samples.metadata['w'])
@@ -506,6 +506,7 @@ for cfg in corrector_configs:
         filename=FILENAME,
         lightweight=False,
         L=L,
+        create_folder = False
     )
 
 print("Done.")
