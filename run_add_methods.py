@@ -25,20 +25,48 @@ parser.add_argument('--n_jobs', type=int, default=-1)
 args = parser.parse_args()
 
 # ── Load existing samples ─────────────────────────────────────────────────────
+# FILENAME = 'NFE_measure_N_60_RM_tests'
+
+# print(f"Loading samples from {FILENAME}...")
+# samples, _ = load_samples(FILENAME, from_folder = False)
+
+# # Recover parameters from metadata
+# w    = np.array(samples.metadata['w'])
+# mu   = np.array(samples.metadata['mu'])
+# beta = samples.metadata['beta']
+# T    = samples.metadata['T']
+# L    = samples.metadata['L']
+
+# already_done = samples.list_methods()
+# print(f"Methods already in samples: {already_done}")
+
+import pickle
+import numpy as np
+from main_code_parallel import DiffusionSamples, generate_forward_samples_at_checkpoints
+
+# Load problem parameters from meta.pkl
+with open('methods/meta.pkl', 'rb') as f:
+    meta = pickle.load(f)
+
+w    = np.array(meta['metadata']['w'])
+mu   = np.array(meta['metadata']['mu'])
+beta = meta['metadata']['beta']
+T    = meta['metadata']['T']
+L    = meta['metadata']['L']
+n_mc = meta['metadata']['n_mc']
+N    = meta['metadata']['N']
+
+# Recreate samples object with forward samples from meta
+times = meta['times']
+samples = DiffusionSamples(times, n_mc, N, L=L)
+samples.forward = meta['forward']
+samples.reverse_methods = {}
+samples.nfe = {}
+samples.metadata = meta['metadata'].copy()
+
 FILENAME = 'NFE_measure_N_60_RM_tests'
-
-print(f"Loading samples from {FILENAME}...")
-samples, _ = load_samples(FILENAME, from_folder = False)
-
-# Recover parameters from metadata
-w    = np.array(samples.metadata['w'])
-mu   = np.array(samples.metadata['mu'])
-beta = samples.metadata['beta']
-T    = samples.metadata['T']
-L    = samples.metadata['L']
-
-already_done = samples.list_methods()
-print(f"Methods already in samples: {already_done}")
+already_done = []
+print(f"Fresh samples created. Running all methods.")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # METHODS TO RUN — edit this section to add/remove methods
