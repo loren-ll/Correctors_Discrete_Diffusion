@@ -30,8 +30,8 @@ parser.add_argument('--n_jobs', type=int, default=-1,
 args = parser.parse_args()
 
 # ── Problem definition ────────────────────────────────────────────────────────
-N, L, r = 60, 3, 5
-n_mc    = 100_000
+N, L, r = 30, 3, 5
+n_mc    = 30_000
 beta, T = 2, 4.5
 
 w   = np.ones(r) / r
@@ -40,7 +40,7 @@ checkpoint_times = T * (u ** 12)
 
 # Fixed problem instance — same mu every run
 rng   = np.random.default_rng(42)
-alpha = np.array([5.0, 1.0, 0.01])   # length L
+alpha = np.array([3.0, 1.5, 0.5])   # length L
 mu    = rng.dirichlet(alpha, size=(r, N))   # shape (r, N, L)
 
 print(f"Problem: N={N}, L={L}, r={r}, n_mc={n_mc}, beta={beta}, T={T}")
@@ -77,7 +77,7 @@ samples.metadata["T"]     = T
 # ── Save ──────────────────────────────────────────────────────────────────────
 save_samples(
     samples,
-    filename='NFE_measure_N_60',
+    filename='NFE_measure_N_30',
     lightweight=False,
     L=L,
 )

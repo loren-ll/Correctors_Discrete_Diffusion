@@ -73,53 +73,9 @@ print(f"Fresh samples created. Running all methods.")
 # ═════════════════════════════════════════════════════════════════════════════
 
 # ── 1. Plain tau-leaping (no corrector) ──────────────────────────────────────
-# tau_values = [4, 3, 2, 1, 0.8, 0.7, 0.6, 0.5, 0.4, 0.2, 0.1, 0.08]
-tau_values = [0.6, 1]
+tau_values = [4, 3, 2, 1, 0.8, 0.7, 0.6, 0.5, 0.4, 0.2, 0.1, 0.08]
 
 # ── 2. Tau-leaping + corrector grid ──────────────────────────────────────────
-# Each entry is a dict describing one (tau, corrector) combination.
-# Set to [] to skip correctors entirely for now.
-corrector_configs = [
-
-    # ── random_masking examples ───────────────────────────────────────────────
-    # {
-    #     'tau': 0.1,
-    #     'corrector_method': 'random_masking',
-    #     'corrector_start': T,
-    #     'corrector_hyperparameters': {'n_corr': 1, 'tau_c': 0.01, 'apply_reverse': True},
-    # },
-
-    # ── PRISM examples ────────────────────────────────────────────────────────
-    # {
-    #     'tau': 0.1,
-    #     'corrector_method': 'PRISM',
-    #     'corrector_start': T,
-    #     'corrector_hyperparameters': {'eta': 0.2},
-    # },
-    # {
-    #     'tau': 0.1,
-    #     'corrector_method': 'PRISM',
-    #     'corrector_start': T,
-    #     'corrector_hyperparameters': {'eta': 0.5},
-    # },
-
-    # ── informed_corrector examples ───────────────────────────────────────────
-    # {
-    #     'tau': 0.1,
-    #     'corrector_method': 'informed_corrector',
-    #     'corrector_start': T,
-    #     'corrector_hyperparameters': {'K': 1, 'n_corr': 8, 'gamma': 1.0, 'use_margin': True},
-    # },
-
-    # ── DPC examples ──────────────────────────────────────────────────────────
-    # {
-    #     'tau': 0.1,
-    #     'corrector_method': 'DPC',
-    #     'corrector_start': T,
-    #     'corrector_hyperparameters': {'n_corr': 8, 'gamma': 1.0},
-    # },
-]
-
 
 corrector_configs = [
     # ----------------------------------PRISM--------------------------------------------------------------
