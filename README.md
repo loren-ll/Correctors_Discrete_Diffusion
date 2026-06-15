@@ -43,5 +43,5 @@ to `methods_N30`, then run again.
 Reproduces the figures in the thesis, in three sections:
 1. **Tests on marginal Hellinger, Gillespie, and tau-leaping** — self-contained;
    can be run on its own.
-2. & 3. — require the precomputed method folders `methods_N30/` and `methods_N200/`
+2. **Tests - N30** and **Tests - N200** — require the precomputed method folders `methods_N30/` and `methods_N200/`
    to be present (produced by `grid_search.py` as described above).
