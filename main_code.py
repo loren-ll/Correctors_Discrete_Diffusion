@@ -632,148 +632,6 @@ def tau_leap_step(x_t, w, mu, beta, t, tau, MASK=-1, rng=None, return_rates=Fals
 
     return x_next
 
-# def tau_leap_reverse_masked(
-#     N, w, mu, beta, T=1.0, tau=0.01, MASK=-1, rng=None,
-#     checkpoint_times=None, unmasking_prob_fn=None
-# ):
-#     """
-#     Tau-leaping reverse sampler for masked diffusion.
-    
-#     Parameters
-#     ----------
-#     N : int
-#         Number of dimensions
-#     w : np.ndarray, shape (r,)
-#         Mixture weights
-#     mu : np.ndarray, shape (r, N, L)
-#         Component probabilities
-#     beta : float
-#         Forward masking rate
-#     T : float
-#         Terminal time
-#     tau : float
-#         Tau-leaping step size
-#     MASK : int
-#         Mask token value
-#     rng : np.random.Generator, optional
-#         Random number generator
-#     checkpoint_times : array-like
-#         Times at which to save state (physical time in [0, T])
-#     unmasking_prob_fn : callable, optional
-#         Not used in tau-leaping (uses internal rate computation)
-    
-#     Returns
-#     -------
-#     final_state : np.ndarray, shape (N,)
-#         Final state at t=0
-#     checkpoint_times : np.ndarray
-#         Array of checkpoint times
-#     checkpoint_samples : np.ndarray, shape (n_checkpoints, N)
-#         States at each checkpoint time
-#     """
-#     if rng is None:
-#         rng = np.random.default_rng()
-    
-#     # Normalize checkpoint times
-#     checkpoint_times = np.sort(np.unique(np.asarray(checkpoint_times, dtype=float)))
-    
-#     # Storage: ARRAY not dict
-#     checkpoint_samples = np.empty((len(checkpoint_times), N), dtype=int)
-    
-#     # Initialize pointer
-#     ckpt_ptr = len(checkpoint_times) - 1
-    
-#     # Start at t=T (fully masked)
-#     x = np.full(N, MASK, dtype=int)
-#     t = float(T)
-    
-#     # Record initial state at all checkpoints >= T
-#     while ckpt_ptr >= 0 and checkpoint_times[ckpt_ptr] >= t:
-#         checkpoint_samples[ckpt_ptr] = x.copy()
-#         ckpt_ptr -= 1
-    
-#     # Simulate backward from T to 0 using tau-leaping
-#     while t > tau:  # Stop when we can't take a full tau step
-#         # Take one tau-leap step backward
-#         x = tau_leap_step(x, w, mu, beta, t, tau, MASK=MASK, rng=rng)
-        
-#         # Move backward in time
-#         t = t - tau
-        
-#         # Record checkpoints for all times in (t, t+tau]
-#         while ckpt_ptr >= 0 and checkpoint_times[ckpt_ptr] > t:
-#             checkpoint_samples[ckpt_ptr] = x.copy()
-#             ckpt_ptr -= 1
-    
-#     # Final step: handle remaining time from t to 0
-#     if t > 0:
-#         final_tau = t  # Take a smaller step to exactly reach t=0
-#         x = tau_leap_step(x, w, mu, beta, t, final_tau, MASK=MASK, rng=rng)
-#         t = 0.0
-    
-#     # Fill any remaining checkpoints with final state
-#     while ckpt_ptr >= 0:
-#         checkpoint_samples[ckpt_ptr] = x.copy()
-#         ckpt_ptr -= 1
-    
-#     # Return array, not dict!
-#     return x, checkpoint_times, checkpoint_samples
-
-
-
-### Adding Particles to Container
-# from math import tau
-
-
-# def add_tau_leap_reverse(samples, w, mu, beta, T, tau, corrector_start=None):
-#     """
-#     Add tau-leaping reverse samples to existing DiffusionSamples.
-    
-#     Parameters
-#     ----------
-#     samples : DiffusionSamples
-#         Container with forward samples already computed
-#     w : np.ndarray
-#         Mixture weights
-#     mu : np.ndarray
-#         Component probabilities
-#     beta : float
-#         Masking rate
-#     T : float
-#         Terminal time
-#     tau : float
-#         Tau-leaping step size
-#     corrector_start : float, optional
-#         Time at which to start applying the corrector
-#     """
-#     n_mc = samples.metadata['n_mc']
-#     N = samples.metadata['N']
-#     checkpoint_times = samples.times
-    
-#     # Create method name with tau value
-#     method_name = f"tau_leap_{tau}_corrector_start_{corrector_start}"
-    
-#     # Pre-allocate storage
-#     samples.reverse_methods[method_name] = {}
-#     for t in checkpoint_times:
-#         samples.reverse_methods[method_name][float(t)] = np.empty((n_mc, N), dtype=np.int16)
-    
-#     print(f"Running tau-leaping (tau={tau}) reverse process...")
-#     rng = np.random.default_rng()
-    
-#     for m in range(n_mc):
-#         if m % 10_000 == 0:
-#             print(f"  Tau-leap particle {m}/{n_mc}")
-        
-#         final_state, times, ckpt_samples = tau_leap_reverse_masked(
-#             N, w, mu, beta, T, tau=tau,
-#             checkpoint_times=checkpoint_times,
-#             rng=np.random.default_rng(rng.integers(1_000_000_000))
-#         )
-        
-#         # Direct assignment (fast!)
-#         for k, t in enumerate(times):
-#             samples.reverse_methods[method_name][float(t)][m] = ckpt_samples[k]
 
 ## Reverse Process Simulation (Tau-Leaping + Corrector steps)
 ### Correctors
@@ -872,20 +730,6 @@ def apply_corrector(
         )
         
         return x_corrected, n_corr
-    elif method == 'DPC':
-        n_corr = hyperparameters.get('n_corr', 8)
-        gamma = hyperparameters.get('gamma', 1.0)
-        unmasking_prob_fn = hyperparameters.get('unmasking_prob_fn')
-        x_corrected = dpc_corrector_step(
-            x=x,
-            unmasking_prob_fn=unmasking_prob_fn,
-            beta=beta,
-            MASK=MASK,
-            rng=rng,
-            n_corr = n_corr,
-            gamma = gamma
-        )
-        return x_corrected, n_corr
     else:
         raise ValueError(f"Unknown corrector method: {method}")
 #### Random Masking - Campbell et al.
@@ -943,53 +787,7 @@ def random_masking_corrector_step(x, w, mu, beta, t, tau_c, MASK=-1, rng=None,
         x_corrected = x_temp
     
     return x_corrected
-#### PRISM Kim et al.
-# def oracle_scores_for_mixture(
-#     y,
-#     unmasking_prob_fn,  # This is make_conditional_prob_fn_mixture result
-#     MASK=-1,
-# ):
-#     """
-#     Compute oracle self-correction scores for one particle y.
-#     For each visible position i, returns
-#         g_i(y) = p_data(X_i = y_i | visible context excluding i)
-    
-#     Parameters
-#     ----------
-#     y : np.ndarray, shape (N,)
-#         One particle / sequence. Masked positions are equal to MASK.
-#     unmasking_prob_fn : callable
-#         Function from make_conditional_prob_fn_mixture that takes a state
-#         and returns p(X_j = v | visible tokens) for all j, v
-#         Returns array of shape (N, L)
-#     MASK : int, default=-1
-#         Mask token.
-    
-#     Returns
-#     -------
-#     scores : np.ndarray, shape (N,)
-#         scores[i] = oracle score if y[i] is visible, np.nan if y[i] is masked.
-#     """
-#     y = np.asarray(y)
-#     N = len(y)
-#     scores = np.full(N, np.nan, dtype=float)
-#     visible_idx = np.where(y != MASK)[0]
-    
-#     for i in visible_idx:
-#         # Build context excluding position i (mask it out)
-#         context = y.copy()
-#         context[i] = MASK
-        
-#         # Get conditional probabilities at position i given other visible tokens
-#         # Shape: (N, L) where L is vocab size
-#         probs = unmasking_prob_fn(context)
-        
-#         # Extract probability for the actual value y[i] at position i
-#         # probs[i] is the distribution over vocab at position i
-#         # y[i] is the actual value, so probs[i, y[i]] is p(X_i = y[i] | context)
-#         scores[i] = probs[i, y[i]]
-    
-#     return scores
+
 def prism_corrector_step(
     y,
     old_y,
@@ -1194,77 +992,6 @@ def informed_corrector_step(
     return x
 
 
-def dpc_corrector_step(
-    x,
-    unmasking_prob_fn,
-    beta,
-    n_corr,
-    gamma=1.0,
-    MASK=-1,
-    rng=None
-):
-    N = len(x)
-    L = unmasking_prob_fn(x).shape[1]   # Infer L from probs shape
-
-    # k = number of tokens to keep UNMASKED
-    # = number of currently unmasked tokens in x after predictor step
-    # This is the natural equivalent of floor(β(t-1) · D) in their discrete setting
-  
-    k =  int(np.sum(x != MASK))
-    k = np.clip(k, 0, N)
-
-    # Start from x_hat_0: denoise all masked positions first
-    x_hat_0 = x.copy()
-    for d in range(N):
-        if x_hat_0[d] == MASK:
-            probs = unmasking_prob_fn(x_hat_0)
-            token_probs = probs[d, :L]
-            token_probs = token_probs / token_probs.sum()
-            x_hat_0[d] = rng.choice(L, p=token_probs)
-
-    x = x_hat_0.copy()
-
-    for j in range(n_corr):
-        # ===== Get corrector logits =====
-        # logit_d = log p(x_d | x_{-d})
-        logits = np.zeros(N)
-
-        for d in range(N):
-            x_masked_d = x.copy()
-            x_masked_d[d] = MASK
-            probs = unmasking_prob_fn(x_masked_d) 
-            token_d = x[d]
-            logits[d] = np.log(probs[d, token_d] + 1e-10)
-
-        # ===== Gumbel noise =====
-        u = rng.uniform(0, 1, size=N)
-        u = np.clip(u, 1e-10, 1 - 1e-10)
-        gumbel_noise = -gamma * np.log(-np.log(u))
-
-        # ===== Perturbed logits =====
-        r = logits + gumbel_noise
-
-        # ===== Top-k positions to keep unmasked =====
-        if k > 0:
-            top_k_indices = np.argsort(r)[-k:]
-        else:
-            top_k_indices = np.array([], dtype=int)
-
-        # ===== Apply mask =====
-        x_new = np.full(N, MASK, dtype=x.dtype)
-        x_new[top_k_indices] = x[top_k_indices]
-        x = x_new
-
-        # ===== Re-denoise for next iteration =====
-        if j < n_corr - 1:
-            for d in range(N):
-                if x[d] == MASK:
-                    probs = unmasking_prob_fn(x)  # ← Same function again!
-                    token_probs = probs[d, :L]
-                    token_probs = token_probs / token_probs.sum()
-                    x[d] = rng.choice(L, p=token_probs)
-
-    return x
 
 
 ### Tau-Leap + Correctors
@@ -1444,11 +1171,6 @@ def tau_leap_reverse_masked(
         checkpoint_samples[ckpt_ptr] = x.copy()
         ckpt_ptr -= 1
     
-    # Return array, not dict!
-    # if corrector:
-    #     print(f"  [diag] corrector calls={corrector_calls}, "
-    #           f"changed x in {corrector_changed} of them, "
-    #           f"total positions remasked={total_remasked}")
     return x, checkpoint_times, checkpoint_samples, nfe_count
 def add_tau_leap_reverse(samples, w, mu, beta, T, tau,
                         corrector=False, corrector_method=None, 
@@ -1698,60 +1420,6 @@ class DiffusionSamples:
         probs = counts / particles.shape[0]
         return states, probs
     
-    # def hellinger_distance(self, p, q):
-    #     """
-    #     Hellinger distance between two PMFs represented as dicts.
-        
-    #     Parameters
-    #     ----------
-    #     p, q : dict
-    #         PMFs mapping states to probabilities
-        
-    #     Returns
-    #     -------
-    #     distance : float
-    #         Hellinger distance between p and q
-    #     """
-    #     support = set(p.keys()) | set(q.keys())
-    #     s = 0.0
-    #     for x in support:
-    #         px = p.get(x, 0.0)
-    #         qx = q.get(x, 0.0)
-    #         s += (np.sqrt(px) - np.sqrt(qx)) ** 2
-    #     return np.sqrt(0.5 * s)
-
-    # More efficient
-
-    # def hellinger_distance(self, particles_a, particles_b):
-    #     """
-    #     Fast Hellinger distance computation by aligning unique states.
-        
-    #     Parameters
-    #     ----------
-    #     particles_a, particles_b : np.ndarray, shape (n_mc, N)
-    #         Arrays of particle samples
-        
-    #     Returns
-    #     -------
-    #     distance : float
-    #         Hellinger distance
-    #     """
-    #     states_a, probs_a = self.particles_to_pmf(particles_a)
-    #     states_b, probs_b = self.particles_to_pmf(particles_b)
-        
-    #     # Build dicts for lookup
-    #     keys_a = {tuple(s): p for s, p in zip(states_a, probs_a)}
-    #     keys_b = {tuple(s): p for s, p in zip(states_b, probs_b)}
-        
-    #     all_keys = set(keys_a) | set(keys_b)
-        
-    #     h2 = 0.0
-    #     for key in all_keys:
-    #         pa = keys_a.get(key, 0.0)
-    #         pb = keys_b.get(key, 0.0)
-    #         h2 += (np.sqrt(pa) - np.sqrt(pb)) ** 2
-        
-    #     return np.sqrt(0.5 * h2)
     
     def hellinger_distance(self, particles_a, particles_b):
         """
